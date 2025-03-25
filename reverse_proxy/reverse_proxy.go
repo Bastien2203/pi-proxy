@@ -66,11 +66,6 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		TLSConfig: &tls.Config{GetCertificate: manager.GetCertificate},
 	}
 
-	// Redirect HTTP to HTTPS
-	go func() {
-		http.ListenAndServe(":80", manager.HTTPHandler(nil))
-	}()
-
 	fmt.Println("Server is running on port 443 with HTTPS")
 	if err := server.ListenAndServeTLS("", ""); err != nil {
 		fmt.Println("Error starting server:", err)
