@@ -9,11 +9,10 @@ import (
 
 func GetCertificate() *tls.Config {
 	manager := &autocert.Manager{
-		Cache:      autocert.DirCache("certs"),
-		Prompt:     autocert.AcceptTOS,
-		Email:      "bastiengrisvard2203@gmail.com",
-		HostPolicy: autocert.HostWhitelist("*.bastiengrisvard.com"),
-		Client:     &acme.Client{DirectoryURL: acme.LetsEncryptURL},
+		Cache:  autocert.DirCache("certs"),
+		Prompt: autocert.AcceptTOS,
+		Email:  "bastiengrisvard2203@gmail.com",
+		Client: &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
 	return &tls.Config{
