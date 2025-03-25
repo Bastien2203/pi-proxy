@@ -1,0 +1,15 @@
+{
+    "nginx.localhost" : {
+        "host": "localhost",
+        "port": 8080,
+        "middlewares": [
+            {
+                "name": "RateLimiter",
+                "options": {
+                    "maxRequests": 30,
+                    "requestTimeout": 60
+                }
+            }
+        ]
+    }
+}

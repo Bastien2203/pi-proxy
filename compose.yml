@@ -1,0 +1,16 @@
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+
+  proxy:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config.json:/app/config.json
+      - ./certs:/app/certs
+    restart: always
