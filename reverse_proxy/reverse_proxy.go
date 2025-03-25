@@ -49,9 +49,9 @@ func ReadProxyConfig() *ProxyConfig {
 
 func RunReverseProxyServer(config *ProxyConfig) {
 	manager := &autocert.Manager{
-		Cache:      autocert.DirCache("certs"),
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(getAllHosts(config)...),
+		Cache:  autocert.DirCache("certs"),
+		Prompt: autocert.AcceptTOS,
+		Email:  "bastiengrisvard2203@gmail.com",
 	}
 
 	server := &http.Server{
@@ -71,12 +71,4 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		fmt.Println("Error starting server:", err)
 		os.Exit(1)
 	}
-}
-
-func getAllHosts(config *ProxyConfig) []string {
-	var hosts []string
-	for host := range *config {
-		hosts = append(hosts, host)
-	}
-	return hosts
 }
