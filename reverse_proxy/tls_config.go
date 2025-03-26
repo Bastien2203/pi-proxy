@@ -15,8 +15,5 @@ func GetCertificate() *tls.Config {
 		Client: &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
-	return &tls.Config{
-		GetCertificate: manager.GetCertificate,
-		NextProtos:     []string{"h2", "http/1.1", acme.ALPNProto},
-	}
+	return &tls.Config{GetCertificate: manager.GetCertificate}
 }
