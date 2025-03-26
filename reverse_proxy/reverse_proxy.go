@@ -1,6 +1,7 @@
 package reverse_proxy
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,8 @@ import (
 	"os"
 
 	"github.com/Bastien2203/pi-proxy/middlewares"
+	"golang.org/x/crypto/acme"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 type Conf struct {
@@ -46,7 +49,14 @@ func ReadProxyConfig() *ProxyConfig {
 }
 
 func RunReverseProxyServer(config *ProxyConfig) {
+	manager := &autocert.Manager{
+		Cache:  autocert.DirCache("certs"),
+		Prompt: autocert.AcceptTOS,
+		Email:  "bastiengrisvard2203@gmail.com",
+		Client: &acme.Client{DirectoryURL: acme.LetsEncryptURL},
+	}
 
+	go http.ListenAndServe(":80", manager.HTTPHandler(nil))
 	server := &http.Server{
 		Addr: ":443",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +66,7 @@ func RunReverseProxyServer(config *ProxyConfig) {
 				http.Error(w, "Not Found", http.StatusNotFound)
 			}
 		}),
-		TLSConfig: GetCertificate(),
+		TLSConfig: &tls.Config{GetCertificate: manager.GetCertificate},
 	}
 
 	fmt.Println("Server is running on port 443 with HTTPS")
