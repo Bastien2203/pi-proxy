@@ -56,7 +56,14 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		Client: &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
-	go http.ListenAndServe(":80", manager.HTTPHandler(nil))
+	go http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/.well-known/acme-challenge/" {
+			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
+			return
+		}
+		manager.HTTPHandler(nil).ServeHTTP(w, r)
+	}))
+
 	server := &http.Server{
 		Addr: ":443",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
