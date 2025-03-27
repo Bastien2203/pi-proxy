@@ -46,6 +46,7 @@ func RateLimiterMiddleware(next http.Handler, options map[string]interface{}) ht
 			rateLimiter.requests[r.Host] = make(map[string][]time.Time)
 		}
 
+		fmt.Println(clientIP)
 		rateLimiter.requests[r.Host][clientIP] = filterOldRequests(rateLimiter.requests[r.Host][clientIP], now)
 
 		if len(rateLimiter.requests[r.Host][clientIP]) >= maxRequests {
