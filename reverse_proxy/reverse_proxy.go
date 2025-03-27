@@ -55,7 +55,7 @@ func RunReverseProxyServer(config *ProxyConfig) {
 	manager := &autocert.Manager{
 		Cache:      autocert.DirCache("certs"),
 		Prompt:     autocert.AcceptTOS,
-		Email:      "bastiengrisvard2203@gmail.com",
+		Email:      os.Getenv("EMAIL"),
 		HostPolicy: autocert.HostWhitelist(authorized_domains...),
 		Client:     &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}

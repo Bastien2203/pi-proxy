@@ -4,6 +4,7 @@ pi-proxy
 
 ## Using docker compose
 
+- Copy `.env.default` to `.env` and update the values
 - Create `config.json` file in the root directory with your config : 
 
     - Key : domain name 

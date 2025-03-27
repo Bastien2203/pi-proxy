@@ -9,6 +9,8 @@ services:
       - ./config.json:/app/config.json
       - ./certs:/app/certs
     restart: always
+    environment:
+      - EMAIL=${EMAIL}
     networks:
       - proxy
 
