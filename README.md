@@ -32,3 +32,6 @@ pi-proxy
 
 - Create certs directory : `mkdir certs`
 - Run `sudo docker compose up -d` to start the proxy
+
+
+> Suggestions and feedback are welcome
