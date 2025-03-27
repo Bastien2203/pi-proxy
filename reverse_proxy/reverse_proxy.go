@@ -61,7 +61,10 @@ func RunReverseProxyServer(config *ProxyConfig) {
 	}
 
 	go func() {
-		h := manager.HTTPHandler(nil)
+		h := manager.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusMovedPermanently)
+			w.Header().Set("Location", "https://"+r.Host+r.RequestURI)
+		}))
 		log.Fatal(http.ListenAndServe(":http", h))
 	}()
 

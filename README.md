@@ -8,7 +8,7 @@ pi-proxy
 
     - Key : domain name 
     - Value : 
-        - host : targeted host of the service
+        - host : targeted host of the service (if docker service, dont forget to add the service in the same network)
         - port : targeted port of the service
         - middlewares : list of middlewares to apply to the service
 
