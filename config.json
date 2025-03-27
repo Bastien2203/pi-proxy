@@ -9,6 +9,9 @@
                     "maxRequests": 30,
                     "requestTimeout": 60
                 }
+            },
+            {
+                "name": "LogRequest"
             }
         ]
     }

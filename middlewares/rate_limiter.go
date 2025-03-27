@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -48,6 +49,7 @@ func RateLimiterMiddleware(next http.Handler, options map[string]interface{}) ht
 		rateLimiter.requests[r.Host][clientIP] = filterOldRequests(rateLimiter.requests[r.Host][clientIP], now)
 
 		if len(rateLimiter.requests[r.Host][clientIP]) >= maxRequests {
+			fmt.Println("Too Many Requests")
 			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
 			return
 		}
