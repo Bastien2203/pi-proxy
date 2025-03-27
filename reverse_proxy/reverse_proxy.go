@@ -62,9 +62,7 @@ func RunReverseProxyServer(config *ProxyConfig) {
 
 	go func() {
 		h := manager.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusMovedPermanently)
-			w.Header().Set("Location", "https://"+r.Host+r.RequestURI)
-			w.Write([]byte("Redirecting to https://" + r.Host + r.RequestURI))
+			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 		}))
 		log.Fatal(http.ListenAndServe(":http", h))
 	}()
