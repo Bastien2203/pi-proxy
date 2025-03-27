@@ -1,7 +1,7 @@
 {
-    "nginx.localhost" : {
+    "oc-data.bastiengrisvard.com" : {
         "host": "localhost",
-        "port": 8080,
+        "port": 80,
         "middlewares": [
             {
                 "name": "RateLimiter",

@@ -1,10 +1,5 @@
 
 services:
-  nginx:
-    image: nginx:latest
-    ports:
-      - "8080:80"
-
   proxy:
     build: .
     ports:
@@ -14,3 +9,9 @@ services:
       - ./config.json:/app/config.json
       - ./certs:/app/certs
     restart: always
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
