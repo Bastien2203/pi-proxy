@@ -1,6 +1,6 @@
 {
     "oc-data.bastiengrisvard.com" : {
-        "host": "localhost",
+        "host": "oc-scrapper-api",
         "port": 80,
         "middlewares": [
             {
