@@ -9,6 +9,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/Bastien2203/pi-proxy/middlewares"
 	"golang.org/x/crypto/acme"
@@ -50,19 +51,21 @@ func ReadProxyConfig() *ProxyConfig {
 
 func RunReverseProxyServer(config *ProxyConfig) {
 	manager := &autocert.Manager{
-		Cache:  autocert.DirCache("certs"),
-		Prompt: autocert.AcceptTOS,
-		Email:  "bastiengrisvard2203@gmail.com",
-		Client: &acme.Client{DirectoryURL: acme.LetsEncryptURL},
+		Cache:      autocert.DirCache("certs"),
+		Prompt:     autocert.AcceptTOS,
+		Email:      "bastiengrisvard2203@gmail.com",
+		HostPolicy: autocert.HostWhitelist(getDomains(config)...),
+		Client:     &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
-	go http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/.well-known/acme-challenge/" {
+	go http.ListenAndServe(":80", manager.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Only redirect if it's not an ACME challenge
+		if !strings.HasPrefix(r.URL.Path, "/.well-known/acme-challenge/") {
 			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
-			return
+		} else {
+			manager.HTTPHandler(nil).ServeHTTP(w, r)
 		}
-		manager.HTTPHandler(nil).ServeHTTP(w, r)
-	}))
+	})))
 
 	server := &http.Server{
 		Addr: ":443",
@@ -73,7 +76,10 @@ func RunReverseProxyServer(config *ProxyConfig) {
 				http.Error(w, "Not Found", http.StatusNotFound)
 			}
 		}),
-		TLSConfig: &tls.Config{GetCertificate: manager.GetCertificate},
+		TLSConfig: &tls.Config{
+			GetCertificate: manager.GetCertificate,
+			NextProtos:     []string{"h2", "http/1.1", acme.ALPNProto},
+		},
 	}
 
 	fmt.Println("Server is running on port 443 with HTTPS")
@@ -81,4 +87,12 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		fmt.Println("Error starting server:", err)
 		os.Exit(1)
 	}
+}
+
+func getDomains(config *ProxyConfig) []string {
+	domains := make([]string, 0, len(*config))
+	for domain := range *config {
+		domains = append(domains, domain)
+	}
+	return domains
 }
