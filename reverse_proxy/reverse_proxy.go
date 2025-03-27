@@ -50,11 +50,13 @@ func ReadProxyConfig() *ProxyConfig {
 }
 
 func RunReverseProxyServer(config *ProxyConfig) {
+	authorized_domains := getDomains(config)
+	fmt.Println("Authorized domains: ", authorized_domains)
 	manager := &autocert.Manager{
 		Cache:      autocert.DirCache("certs"),
 		Prompt:     autocert.AcceptTOS,
 		Email:      "bastiengrisvard2203@gmail.com",
-		HostPolicy: autocert.HostWhitelist(getDomains(config)...),
+		HostPolicy: autocert.HostWhitelist(authorized_domains...),
 		Client:     &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
