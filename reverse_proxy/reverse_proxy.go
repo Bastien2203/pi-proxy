@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/Bastien2203/pi-proxy/middlewares"
 	"golang.org/x/crypto/acme"
@@ -58,14 +58,10 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		Client:     &acme.Client{DirectoryURL: acme.LetsEncryptURL},
 	}
 
-	go http.ListenAndServe(":80", manager.HTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Only redirect if it's not an ACME challenge
-		if !strings.HasPrefix(r.URL.Path, "/.well-known/acme-challenge/") {
-			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
-		} else {
-			manager.HTTPHandler(nil).ServeHTTP(w, r)
-		}
-	})))
+	go func() {
+		h := manager.HTTPHandler(nil)
+		log.Fatal(http.ListenAndServe(":http", h))
+	}()
 
 	server := &http.Server{
 		Addr: ":443",
@@ -78,15 +74,11 @@ func RunReverseProxyServer(config *ProxyConfig) {
 		}),
 		TLSConfig: &tls.Config{
 			GetCertificate: manager.GetCertificate,
-			NextProtos:     []string{"h2", "http/1.1", acme.ALPNProto},
 		},
 	}
 
 	fmt.Println("Server is running on port 443 with HTTPS")
-	if err := server.ListenAndServeTLS("", ""); err != nil {
-		fmt.Println("Error starting server:", err)
-		os.Exit(1)
-	}
+	log.Fatal(server.ListenAndServeTLS("", ""))
 }
 
 func getDomains(config *ProxyConfig) []string {
